@@ -27,7 +27,7 @@ jobs:
         pip install recommonmark  # If you are using Markdown
         pip install myst-parser  # For Markdown support
         pip install myst-nb  # For Jupyter Notebook support, includes myst-parser
-        pip install sphinx sphinx-autoapi  # Add sphinx-autoapi here
+        pip install sphinx sphinx-autoapi sphinx_rtd_theme # Add sphinx-autoapi here
 
 
     - name: Build documentation
