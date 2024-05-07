@@ -5,25 +5,13 @@
 # Required
 version: 2
 
-# Set the OS, Python version and other tools you might need
-build:
-  os: ubuntu-22.04
-  # Python version
-  python:
-    version: 3.9
-    install:
-      - requirements: docs/requirements.txt
+# Python configuration
+python:
+  version: 3.9
+  install:
+    - method: pip
+      path: docs/requirements.txt
 
-# Build documentation with Sphinx
+# Build documentation in the "docs/" directory with Sphinx
 sphinx:
   configuration: docs/conf.py
-
-# Define custom steps to install poetry and dependencies
-build:
-  jobs:
-    post_create_environment:
-      # Install poetry using pip
-      - pip install poetry
-    post_install:
-      # Run poetry install within the virtual environment
-      - VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install
