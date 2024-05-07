@@ -1,78 +1,99 @@
 from dotenv import load_dotenv
-
-load_dotenv()
 import os
 import google.generativeai as genai
 from openai import OpenAI
 import polars as pl
-import streamlit as st
 import duckdb
 
+load_dotenv()
 
-def gemini_setup():
+class GeminiAPI:
     """
-    Initializes Google's API endpoint for Gemini Access by configuring the API key and listing supported models.
+    Class to handle operations related to Google's Gemini API.
     """
-    api_key = os.getenv("API_KEY")
-    genai.configure(api_key=api_key)
+    def __init__(self):
+        """
+        Initializes Google's API endpoint for Gemini Access by configuring the API key and listing supported models.
+        """
+        self.api_key = os.getenv("API_KEY")
+        genai.configure(api_key=self.api_key)
+        self.models = self.list_supported_models()
 
-    try:
-        for m in genai.list_models():
-            if "generateContent" in m.supported_generation_methods:
-                print(m.name)
-    except Exception:
-        raise Exception("Please check your API key")
+    def list_supported_models(self):
+        """
+        List models that support content generation.
+        """
+        try:
+            return [m for m in genai.list_models() if "generateContent" in m.supported_generation_methods]
+        except Exception:
+            raise Exception("Please check your API key")
+
+    def print_models(self):
+        """
+        Prints the names of models supporting content generation.
+        """
+        for model in self.models:
+            print(model.name)
 
 
-def openai_setup():
+class OpenAIAPI:
     """
-    Initializes OpenAI's API endpoint for GPT-4 Access and returns an OpenAI client instance.
+    Class to handle operations related to OpenAI's GPT.
     """
-    client = OpenAI(api_key=os.environ.get("OpenAI"))
-    return client
+    def __init__(self):
+        """
+        Initializes OpenAI's API endpoint for GPT-4 Access and returns an OpenAI client instance.
+        """
+        self.api_key = os.getenv("OpenAI")
+        self.client = OpenAI(api_key=self.api_key)
+
+    def get_client(self):
+        """
+        Returns the OpenAI client.
+        """
+        return self.client
 
 
-def pl_loadLazy(data_path, response_message):
+class PolarsSQL:
     """
-    Loads a Polars dataframe lazily from a given path and executes an SQL query using Polars' SQL context.
-
-    Args:
-        data_path (str): Path where the dataset is located.
-        response_message (str): SQL query to be executed.
-
-    Returns:
-        pl.DataFrame: Resulting dataframe after executing the query.
+    Class to handle operations with Polars and SQL queries.
     """
-    NYCTLC = pl.read_parquet(data_path).lazy()
-    with pl.SQLContext(register_globals=True) as NYCTLC:
-        res = NYCTLC.execute(response_message + ";").collect()
+    @staticmethod
+    def load_lazy(data_path, response_message):
+        """
+        Loads a Polars dataframe lazily from a given path and executes an SQL query using Polars' SQL context.
 
-    return res
+        Args:
+            data_path (str): Path where the dataset is located.
+            response_message (str): SQL query to be executed.
 
+        Returns:
+            pl.DataFrame: Resulting dataframe after executing the query.
+        """
+        nyctlc = pl.read_parquet(data_path).lazy()
+        with pl.SQLContext(register_globals=True) as nyctlc:
+            res = nyctlc.execute(response_message + ";").collect()
 
-def execute_sql_query(data_path, query, df_name):
-    """
-    Executes an SQL query on a Polars dataframe using DuckDB, given a path to a dataset.
+        return res
 
-    Args:
-        data_path (str): Path where the dataset is located.
-        query (str): SQL query to be executed.
-        df_name (str): Name of the dataframe to be used as an alias in the SQL context.
+    @staticmethod
+    def execute_sql_query(data_path, query, df_name):
+        """
+        Executes an SQL query on a Polars dataframe using DuckDB, given a path to a dataset.
 
-    Returns:
-        pl.DataFrame: Resulting dataframe after executing the query.
-    """
-    # Load the dataset with Polars
-    df = pl.read_parquet(data_path)
-    # Initialize a DuckDB connection
-    con = duckdb.connect()
-    # Register the Polars DataFrame as a view within DuckDB, using df_name as the alias in the SQL context
-    con.register(df_name, df)
-    # Execute the query and fetch results as an Arrow table
-    arrow_table = con.execute(query).fetch_arrow_table()
-    # Convert Arrow Table to Polars DataFrame
-    result = pl.from_arrow(arrow_table)
-    # Close the connection
-    con.close()
+        Args:
+            data_path (str): Path where the dataset is located.
+            query (str): SQL query to be executed.
+            df_name (str): Name of the dataframe to be used as an alias in the SQL context.
 
-    return result
+        Returns:
+            pl.DataFrame: Resulting dataframe after executing the query.
+        """
+        df = pl.read_parquet(data_path)
+        con = duckdb.connect()
+        con.register(df_name, df)
+        arrow_table = con.execute(query).fetch_arrow_table()
+        result = pl.from_arrow(arrow_table)
+        con.close()
+
+        return result
