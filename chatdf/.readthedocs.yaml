@@ -5,11 +5,14 @@
 # Required
 version: 2
 
-# Python version
-python:
-  version: 3.9
-  install:
-    - requirements: docs/requirements.txt
+# Set the OS, Python version and other tools you might need
+build:
+  os: ubuntu-22.04
+  # Python version
+  python:
+    version: 3.9
+    install:
+      - requirements: docs/requirements.txt
 
 # Build documentation with Sphinx
 sphinx:
