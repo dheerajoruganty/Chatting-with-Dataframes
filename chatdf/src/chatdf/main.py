@@ -5,16 +5,20 @@ import json
 
 
 def select_df():
+    """
+    Interactively prompts the user to select a dataset from a predefined list. It handles invalid inputs and allows
+    the user to exit. Returns the path and schema of the selected dataset.
+
+    Returns:
+        tuple: Contains the path to the selected dataset (str) and its associated schema (dict).
+    """
+
     try:
         while True:
-            dflist ={
-                1: 'NYCTLC',
-                2: 'Breast Cancer',
-                3: 'Exit'
-            }
+            dflist = {1: "NYCTLC", 2: "Breast Cancer", 3: "Exit"}
             print("Select the dataset")
             print("================================")
-            print (json.dumps(dflist, indent=2))
+            print(json.dumps(dflist, indent=2))
             usrInput = int(input("Select the dataset you want to load from:"))
             if usrInput > len(dflist):
                 print("Input invalid!, Please try again.")
@@ -24,14 +28,12 @@ def select_df():
                 df = dflist[usrInput]
                 break
     except Exception as e:
-       print(f'{e}')
-       exit(1)
-    dfpath = {
-        'NYCTLC' : '../../data/NYCTLC-2023-1.parquet'
-    } 
+        print(f"{e}")
+        exit(1)
+    dfpath = {"NYCTLC": "../../data/NYCTLC-2023-1.parquet"}
 
     dfSchema = {
-        'NYCTLC' :   """VendorID, int64
+        "NYCTLC": """VendorID, int64
                         tpep_pickup_datetime, datetime64[us]
                         tpep_dropoff_datetime, datetime64[us]
                         passenger_count, float64
@@ -50,22 +52,40 @@ def select_df():
                         total_amount, float64
                         congestion_surcharge, float64
                         airport_fee, float64"""
-    } 
+    }
     return dfpath[df], dfSchema
 
+
 def load_gpt(dfSchema):
+    """
+    Takes a dataframe schema and prompts the user to input a search query. It uses OpenAI's GPT-4 to generate a SQL
+    query based on the input schema and the user's prompt.
+
+    Args:
+        dfSchema (dict): Schema of the dataframe containing datatype information.
+
+    Returns:
+        str: Generated SQL query as a plain text string.
+    """
+
     print("Schema of Dataframe:")
     for i in dfSchema.values():
         print(i)
     prompt = input("Please input what you want to search for:")
     client = utils.openai_setup()
-    messages=[
-        {"role": "system", "content": "You are a sql assistant. Who is an expert in writing sql queries for polars dataframes.\
-          The first Prompt, would be the schema and the datatypes. I want a result out in text format."},
-        {"role": "user", "content": f'{dfSchema}'},
-        {"role": "user", "content": f"{prompt}. \
-                                    Only give me the SQL query in plaintext in a single line without any markdown or extra tokens"}
-      ]
+    messages = [
+        {
+            "role": "system",
+            "content": "You are a sql assistant. Who is an expert in writing sql queries for polars dataframes.\
+          The first Prompt, would be the schema and the datatypes. I want a result out in text format.",
+        },
+        {"role": "user", "content": f"{dfSchema}"},
+        {
+            "role": "user",
+            "content": f"{prompt}. \
+                                    Only give me the SQL query in plaintext in a single line without any markdown or extra tokens",
+        },
+    ]
 
     response = client.chat.completions.create(
         model="gpt-4-0125-preview",
@@ -73,20 +93,30 @@ def load_gpt(dfSchema):
         temperature=0,
         max_tokens=4096,
         top_p=1,
-        )
+    )
     response_message = response.choices[0].message
     print(response_message.content)
     return response_message.content
 
-def load_polars(dfpath,response_message):
+
+def load_polars(dfpath, response_message):
+    """
+    Loads a dataframe based on a provided path and executes a SQL query on it using Polars' lazy evaluation.
+
+    Args:
+        dfpath (str): Path to the dataset.
+        response_message (str): SQL query to execute.
+
+    Returns:
+        pl.DataFrame: Dataframe resulting from the executed SQL query.
+    """
+
     df = utils.pl_loadLazy(dfpath, response_message)
     print(df)
     return df
 
 
-
 if __name__ == "__main__":
-        df_path, df_schema = select_df()
-        gpt_res = load_gpt(dfSchema=df_schema)
-        pl_res = load_polars(response_message=gpt_res, dfpath=df_path)
-    
+    df_path, df_schema = select_df()
+    gpt_res = load_gpt(dfSchema=df_schema)
+    pl_res = load_polars(response_message=gpt_res, dfpath=df_path)

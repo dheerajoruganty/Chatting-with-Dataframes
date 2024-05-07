@@ -6,9 +6,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = u"chatdf"
-copyright = u"2024, Dheeraj Oruganty, Pranav Patil, Yifan"
-author = u"Dheeraj Oruganty, Pranav Patil, Yifan"
+project = "chatdf"
+copyright = "2024, Dheeraj Oruganty, Pranav Patil, Yifan"
+author = "Dheeraj Oruganty, Pranav Patil, Yifan"
 
 # -- General configuration ---------------------------------------------------
 
