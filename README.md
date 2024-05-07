@@ -16,6 +16,8 @@ $ pip install chatdf
 
 [Web version](https://chatbotpy-5rvjgceuhzisrfymppycmw.streamlit.app)
 
+![App](web_info/picture/app.png)
+
 ### Introduction
 
 This web application, developed using the Streamlit framework, is designed to enhance user convenience in utilizing our software package. Should you encounter any difficulties or have questions regarding its usage, please consult the [documentation]((https://chatbotpy-5rvjgceuhzisrfymppycmw.streamlit.app)) or reach out to our development team for support.
