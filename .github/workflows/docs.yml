@@ -25,6 +25,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install sphinx  # Install Sphinx
         pip install recommonmark  # If you are using Markdown
+        pip install myst-parser  # For Markdown support
+        pip install myst-nb  # For Jupyter Notebook support, includes myst-parser
+
 
     - name: Build documentation
       run: |
