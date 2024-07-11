@@ -6,6 +6,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://foundation-model-benchmarking-tool.github.io/report.html</loc>
+         <lastmod>2024-07-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://foundation-model-benchmarking-tool.github.io/versions.html</loc>
          <lastmod>2024-07-11</lastmod>
          <changefreq>daily</changefreq>
