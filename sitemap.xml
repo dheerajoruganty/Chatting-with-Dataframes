@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://foundation-model-benchmarking-tool.github.io/index.html</loc>
+         <loc>https://foundation-model-benchmarking-tool.github.io/overview.html</loc>
          <lastmod>2024-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://foundation-model-benchmarking-tool.github.io/overview.html</loc>
+         <loc>https://foundation-model-benchmarking-tool.github.io/versions.html</loc>
          <lastmod>2024-07-11</lastmod>
          <changefreq>daily</changefreq>
     </url>
